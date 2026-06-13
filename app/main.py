@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -32,4 +33,18 @@ async def list_lessons(topic: str | None = None, limit: int = 10):
     return {
         "topic": topic,
         "limit": limit
+    }
+
+
+class CreateStudySession(BaseModel):
+    topic: str
+    duration_minutes: int
+    difficulty: str
+
+
+@app.post('/study-sessions')
+async def study_sessions(session: CreateStudySession):
+    return {
+        "message": "Study session created",
+        "session": session
     }
