@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
+
+from app.services import goal_service
 
 
 router = APIRouter(prefix="/goals", tags=["goals"])
 
-goals = []
 
 class CreateGoal(BaseModel):
     title: str
@@ -13,54 +14,24 @@ class CreateGoal(BaseModel):
 
 @router.get('')
 async def list_goals():
-    return goals
+    return goal_service.get_goals()
 
 
 @router.get('/{goal_id}')
 async def get_goal(goal_id: int):
-    for goal in goals:
-        if goal['id'] == goal_id:
-            return goal
-
-    raise HTTPException(status_code=404, detail="Goal not found")
+    return goal_service.get_goal(goal_id)
 
 
 @router.post('')
 async def create_goal(goal: CreateGoal):
-    new_goal = {
-        "id": len(goals) + 1,
-        "title": goal.title,
-        "category": goal.category,
-        "is_completed": False
-    }
-
-    goals.append(new_goal)
-
-    return new_goal
+    return goal_service.create_goal(goal)
 
 
 @router.put('/{goal_id}')
 async def update_goal(goal_id: int, updated_goal: CreateGoal):
-
-    for goal in goals:
-        if goal['id'] == goal_id:
-            goal['title'] = updated_goal.title
-            goal['category'] = updated_goal.category
-
-            return goal
-
-    raise HTTPException(status_code=404, detail="Goal not found")
+    return goal_service.update_goal(goal_id, updated_goal)
 
 
 @router.delete('/{goal_id}')
 async def delete_goal(goal_id: int):
-    for goal in goals:
-        if goal['id'] == goal_id:
-            goals.remove(goal)
-
-            return {
-                "message": "Goal deleted",
-                "goal_id": goal_id
-            }
-
-    raise HTTPException(status_code=404, detail="Goal not found")
+    return goal_service.delete_goal(goal_id)
