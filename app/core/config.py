@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     environment: str = "development"
     debug: bool = True
     api_version: str = "0.1.0"
-    database_url: str = "sqlite:///./app.db"
+    database_url: str = "sqlite:///./data/app.db"
 
     model_config = SettingsConfigDict(env_file=".env")
 
