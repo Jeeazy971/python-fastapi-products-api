@@ -1,8 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
+from typing import Annotated
 
-from app.services import goal_service
+from app.services.goal_service import GoalService, get_goal_service
 
+GoalServiceDep = Annotated[GoalService, Depends(get_goal_service)]
 
 router = APIRouter(prefix="/goals", tags=["goals"])
 
@@ -13,25 +15,25 @@ class CreateGoal(BaseModel):
 
 
 @router.get('')
-async def list_goals():
-    return goal_service.get_goals()
+async def list_goals(service: GoalServiceDep):
+    return service.list_goals()
 
 
 @router.get('/{goal_id}')
-async def get_goal(goal_id: int):
-    return goal_service.get_goal(goal_id)
+async def get_goal(goal_id: int, service: GoalServiceDep):
+    return service.get_goal(goal_id)
 
 
 @router.post('')
-async def create_goal(goal: CreateGoal):
-    return goal_service.create_goal(goal)
+async def create_goal(goal: CreateGoal, service: GoalServiceDep):
+    return service.create_goal(goal)
 
 
 @router.put('/{goal_id}')
-async def update_goal(goal_id: int, updated_goal: CreateGoal):
-    return goal_service.update_goal(goal_id, updated_goal)
+async def update_goal(goal_id: int, updated_goal: CreateGoal, service: GoalServiceDep):
+    return service.update_goal(goal_id, updated_goal)
 
 
 @router.delete('/{goal_id}')
-async def delete_goal(goal_id: int):
-    return goal_service.delete_goal(goal_id)
+async def delete_goal(goal_id: int, service: GoalServiceDep):
+    return service.delete_goal(goal_id)
