@@ -1,16 +1,31 @@
-from fastapi import FastAPI
+from typing import Annotated
+
+from fastapi import Depends, FastAPI
 from pydantic import BaseModel
 
 from app.routers import goals
+from app.core.config import Settings, get_settings
 
 app = FastAPI()
 
 app.include_router(goals.router)
 
+SettingsDep = Annotated[Settings, Depends(get_settings)]
+
 
 @app.get('/health')
 async def health():
     return {"status": "ok"}
+
+
+@app.get('/config')
+async def get_config(settings: SettingsDep):
+    return {
+        "app_name": settings.app_name,
+        "environment": settings.environment,
+        "debug": settings.debug,
+        "api_version": settings.api_version,
+    }
 
 
 @app.get('/learning-status')
